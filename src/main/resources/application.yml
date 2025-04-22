@@ -1,4 +1,4 @@
 exchange:
   api:
-    base-url: www.onet.pl
-    api-key: 9idfj2iu0jfu204
+    base-url: https://api.apilayer.com/exchangerates_data
+    api-key: Rsn3CzgJ8u1KOYRl8z4uJTVENT8rboZQ
