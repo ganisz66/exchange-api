@@ -4,13 +4,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import pl.szlify.exchangeapi.dto.CurrencyConversionDto;
 import pl.szlify.exchangeapi.dto.CurrencySymbolsDto;
 import pl.szlify.exchangeapi.dto.FluctuationDto;
+import pl.szlify.exchangeapi.dto.HistoricalRatesDto;
 import pl.szlify.exchangeapi.dto.LatestRatesDto;
+import pl.szlify.exchangeapi.dto.TimeSeriesDto;
 import pl.szlify.exchangeapi.model.TestModel;
 import pl.szlify.exchangeapi.service.CurrencyService;
 
@@ -60,5 +63,22 @@ public class CurrencyController {
             @RequestParam(required = false) String base,
             @RequestParam(required = false) String symbols) {
         return ResponseEntity.ok(currencyService.getLatestRates(base, symbols));
+    }
+
+    @GetMapping("/timeseries")
+    public ResponseEntity<TimeSeriesDto> getTimeSeries(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(required = false) String base,
+            @RequestParam(required = false) String symbols) {
+        return ResponseEntity.ok(currencyService.getTimeSeries(startDate, endDate, base, symbols));
+    }
+
+    @GetMapping("/{date}")
+    public ResponseEntity<HistoricalRatesDto> getHistoricalRates(
+            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam(required = false) String base,
+            @RequestParam(required = false) String symbols) {
+        return ResponseEntity.ok(currencyService.getHistoricalRates(date, base, symbols));
     }
 }

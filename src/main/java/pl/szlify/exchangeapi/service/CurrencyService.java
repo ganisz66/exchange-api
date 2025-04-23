@@ -11,7 +11,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 import pl.szlify.exchangeapi.dto.CurrencyConversionDto;
 import pl.szlify.exchangeapi.dto.CurrencySymbolsDto;
 import pl.szlify.exchangeapi.dto.FluctuationDto;
+import pl.szlify.exchangeapi.dto.HistoricalRatesDto;
 import pl.szlify.exchangeapi.dto.LatestRatesDto;
+import pl.szlify.exchangeapi.dto.TimeSeriesDto;
 import pl.szlify.exchangeapi.model.TestModel;
 import pl.szlify.exchangeapi.properties.ExchangeApiProperties;
 
@@ -115,6 +117,59 @@ public class CurrencyService {
                 HttpMethod.GET,
                 new HttpEntity<>(headers),
                 LatestRatesDto.class
+        );
+        return response.getBody();
+    }
+
+    public TimeSeriesDto getTimeSeries(LocalDate startDate, LocalDate endDate, String base, String symbols) {
+
+        UriComponentsBuilder builder = UriComponentsBuilder
+                .fromUriString(properties.getBaseUrl() + "/timeseries")
+                .queryParam("start_date", startDate.toString())
+                .queryParam("end_date", endDate.toString());
+
+        if (base != null && !base.isEmpty()) {
+            builder.queryParam("base", base);
+        }
+
+        if (symbols != null && !symbols.isEmpty()) {
+            builder.queryParam("symbols", symbols);
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("apikey", properties.getApiKey());
+
+        ResponseEntity<TimeSeriesDto> response = new RestTemplate().exchange(
+                builder.toUriString(),
+                HttpMethod.GET,
+                new HttpEntity<>(headers),
+                TimeSeriesDto.class
+        );
+
+        return response.getBody();
+    }
+
+    public HistoricalRatesDto getHistoricalRates(LocalDate date, String base, String symbols) {
+
+        UriComponentsBuilder builder = UriComponentsBuilder
+                .fromUriString(properties.getBaseUrl() + "/" + date.toString());
+
+        if (base != null && !base.isEmpty()) {
+            builder.queryParam("base", base);
+        }
+
+        if (symbols != null && !symbols.isEmpty()) {
+            builder.queryParam("symbols", symbols);
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("apikey", properties.getApiKey());
+
+        ResponseEntity<HistoricalRatesDto> response = new RestTemplate().exchange(
+                builder.toUriString(),
+                HttpMethod.GET,
+                new HttpEntity<>(headers),
+                HistoricalRatesDto.class
         );
         return response.getBody();
     }

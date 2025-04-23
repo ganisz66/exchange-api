@@ -8,10 +8,10 @@ import java.util.Map;
 
 @Getter
 @Builder
-public class LatestRatesDto {
-
+public class HistoricalRatesDto {
     private String base;
     private String date;
+    private boolean historical;
     private Map<String, BigDecimal> rates;
     private boolean success;
     private long timestamp;
