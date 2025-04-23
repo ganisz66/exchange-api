@@ -60,7 +60,4 @@ public class CurrencyService {
         Object resultObj = Objects.requireNonNull(response.getBody()).get("result");
         return new BigDecimal(resultObj.toString());
     }
-
-
-
 }
