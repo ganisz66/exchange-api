@@ -8,10 +8,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import pl.szlify.exchangeapi.model.TestModel;
+import pl.szlify.exchangeapi.model.dto.CurrencyRateDto;
 import pl.szlify.exchangeapi.service.CurrencyService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -34,5 +37,15 @@ public class CurrencyController {
     ) {
         BigDecimal result = currencyService.convertCurrency(from, to, amount, date);
         return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/fluctuation")
+    public ResponseEntity<Map<String, CurrencyRateDto>> fluctuation(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) String base,
+            @RequestParam(required = false) List<String> symbols
+    ) {
+        return ResponseEntity.ok(currencyService.getFluctuation(startDate, endDate, base, symbols));
     }
 }
