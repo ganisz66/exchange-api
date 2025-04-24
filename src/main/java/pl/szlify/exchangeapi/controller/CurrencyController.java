@@ -1,5 +1,6 @@
 package pl.szlify.exchangeapi.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import pl.szlify.exchangeapi.model.TestModel;
+import pl.szlify.exchangeapi.model.command.ConvertCommand;
 import pl.szlify.exchangeapi.model.dto.CurrencyRateDto;
 import pl.szlify.exchangeapi.service.CurrencyService;
 
@@ -25,13 +27,8 @@ public class CurrencyController {
     public final CurrencyService currencyService;
 
     @GetMapping("/convert")
-    public ResponseEntity<BigDecimal> convertCurrency(
-            @RequestParam String from,
-            @RequestParam String to,
-            @RequestParam BigDecimal amount,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
-    ) {
-        BigDecimal result = currencyService.convertCurrency(from, to, amount, date);
+    public ResponseEntity<BigDecimal> convertCurrency(@Valid ConvertCommand command) {
+        BigDecimal result = currencyService.convertCurrency(command);
         return ResponseEntity.ok(result);
     }
 

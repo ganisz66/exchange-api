@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import pl.szlify.exchangeapi.model.TestModel;
+import pl.szlify.exchangeapi.model.command.ConvertCommand;
 import pl.szlify.exchangeapi.model.dto.CurrencyRateDto;
 import pl.szlify.exchangeapi.model.dto.FluctuationResponseDto;
 import pl.szlify.exchangeapi.model.dto.HistoricalDateRatesDto;
@@ -33,18 +34,18 @@ public class CurrencyService {
     private final ExchangeApiProperties properties;
     private final RestTemplate restTemplate;
 
-    public BigDecimal convertCurrency(String from, String to, BigDecimal amount, LocalDate date) {
+    public BigDecimal convertCurrency(ConvertCommand command) {
         URI baseUri = URI.create(properties.getBaseUrl() + "/convert");
 
         UriComponentsBuilder uriBuilder = UriComponentsBuilder
                 .newInstance()
                 .uri(baseUri)
-                .queryParam("from", from)
-                .queryParam("to", to)
-                .queryParam("amount", amount);
+                .queryParam("from", command.getFrom())
+                .queryParam("to", command.getTo())
+                .queryParam("amount", command.getAmount());
 
-        if (date != null) {
-            uriBuilder.queryParam("date", date.toString());
+        if (command.getDate() != null) {
+            uriBuilder.queryParam("date", command.getDate().toString());
         }
 
         HttpHeaders headers = new HttpHeaders();
