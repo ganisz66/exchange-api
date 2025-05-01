@@ -5,3 +5,16 @@ exchange:
 cache:
   expiration-hours: 1
   maximum-size: 100
+spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: jankowalksiii12@gmail.com
+    password: ypvx ehmk tmjk ktkj
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+

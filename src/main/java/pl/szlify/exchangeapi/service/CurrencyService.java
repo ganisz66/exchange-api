@@ -21,12 +21,15 @@ import pl.szlify.exchangeapi.model.dto.TimeSeriesRatesDto;
 public class CurrencyService {
 
     private final ExchangeClient exchangeClient;
+    private final EmailService emailService;
 
     public CurrencyConversionDto convertCurrency(ConvertCommand command) {
-        return exchangeClient.currencyConversion(command.getFrom(),
+        CurrencyConversionDto convertResult = exchangeClient.currencyConversion(command.getFrom(),
                 command.getTo(),
                 command.getAmount(),
                 command.getDate());
+        emailService.send("jankowalksiii12@gmail.com", convertResult);
+        return convertResult;
     }
 
     public FluctuationDto getFluctuation(FluctuationCommand command) {
