@@ -6,20 +6,21 @@ import lombok.RequiredArgsConstructor;
 import pl.szlify.exchangeapi.model.dto.SymbolsDto;
 import pl.szlify.exchangeapi.service.CurrencyService;
 
-@RequiredArgsConstructor
-public class SupportedCurrencyValidator implements ConstraintValidator<SupportedCurrency, String> {
+import java.util.List;
 
+@RequiredArgsConstructor
+public class SupportedCurrencyListValidator implements ConstraintValidator<SupportedCurrency, List<String>> {
     private final CurrencyService currencyService;
 
     @Override
-    public boolean isValid(String currencySymbol, ConstraintValidatorContext constraintValidatorContext) {
-        if (currencySymbol == null || currencySymbol.isBlank()) {
+    public boolean isValid(List<String> currencySymbols, ConstraintValidatorContext constraintValidatorContext) {
+        if (currencySymbols == null || currencySymbols.isEmpty()) {
             return true;
         }
 
         SymbolsDto symbolsDto = currencyService.getSymbols();
         return symbolsDto != null
                 && symbolsDto.getSymbols() != null
-                && symbolsDto.getSymbols().containsKey(currencySymbol);
+                && currencySymbols.stream().allMatch(symbolsDto.getSymbols()::containsKey);
     }
 }

@@ -1,209 +1,80 @@
 package pl.szlify.exchangeapi.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
-import pl.szlify.exchangeapi.model.TestModel;
+import pl.szlify.exchangeapi.client.ExchangeClient;
 import pl.szlify.exchangeapi.model.command.ConvertCommand;
-import pl.szlify.exchangeapi.model.dto.CurrencyRateDto;
-import pl.szlify.exchangeapi.model.dto.FluctuationResponseDto;
+import pl.szlify.exchangeapi.model.command.FluctuationCommand;
+import pl.szlify.exchangeapi.model.command.HistoricalDateCommand;
+import pl.szlify.exchangeapi.model.command.LatestCommand;
+import pl.szlify.exchangeapi.model.command.TimeseriesCommand;
+import pl.szlify.exchangeapi.model.dto.CurrencyConversionDto;
+import pl.szlify.exchangeapi.model.dto.FluctuationDto;
 import pl.szlify.exchangeapi.model.dto.HistoricalDateRatesDto;
-import pl.szlify.exchangeapi.model.dto.LatestRatesResponseDto;
+import pl.szlify.exchangeapi.model.dto.LatestRatesDto;
 import pl.szlify.exchangeapi.model.dto.SymbolsDto;
-import pl.szlify.exchangeapi.model.dto.TimeSeriesRatesResponseDto;
-import pl.szlify.exchangeapi.properties.ExchangeApiProperties;
-
-import java.math.BigDecimal;
-import java.net.URI;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import pl.szlify.exchangeapi.model.dto.TimeSeriesRatesDto;
 
 @Service
 @RequiredArgsConstructor
 public class CurrencyService {
 
-    private final ExchangeApiProperties properties;
-    private final RestTemplate restTemplate;
+    private final ExchangeClient exchangeClient;
 
-    public BigDecimal convertCurrency(ConvertCommand command) {
-        URI baseUri = URI.create(properties.getBaseUrl() + "/convert");
-
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder
-                .newInstance()
-                .uri(baseUri)
-                .queryParam("from", command.getFrom())
-                .queryParam("to", command.getTo())
-                .queryParam("amount", command.getAmount());
-
-        if (command.getDate() != null) {
-            uriBuilder.queryParam("date", command.getDate().toString());
-        }
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("apikey", properties.getApiKey());
-
-        HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
-
-        ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
-                uriBuilder.build().toUri(),
-                HttpMethod.GET,
-                requestEntity,
-                new ParameterizedTypeReference<>() {
-                }
-        );
-
-        Object resultObj = Objects.requireNonNull(response.getBody()).get("result");
-        return new BigDecimal(resultObj.toString());
+    public CurrencyConversionDto convertCurrency(ConvertCommand command) {
+        return exchangeClient.currencyConversion(command.getFrom(),
+                command.getTo(),
+                command.getAmount(),
+                command.getDate());
     }
 
-    public Map<String, CurrencyRateDto> getFluctuation(LocalDate endDate, LocalDate startDate, String baseCurrency, List<String> symbols) {
-        URI baseUri = URI.create(properties.getBaseUrl() + "/fluctuation");
+    public FluctuationDto getFluctuation(FluctuationCommand command) {
+        String symbolsParam = command.getSymbols() == null || command.getSymbols().isEmpty()
+                ? null
+                : String.join(",", command.getSymbols());
 
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder
-                .newInstance()
-                .uri(baseUri)
-                .queryParam("end_date", endDate.toString())
-                .queryParam("start_date", startDate.toString())
-                .queryParam("base", baseCurrency);
-
-        addSymbolsParam(uriBuilder, symbols);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("apikey", properties.getApiKey());
-
-        HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
-
-        ResponseEntity<FluctuationResponseDto> response = restTemplate.exchange(
-                uriBuilder.build().toUri(),
-                HttpMethod.GET,
-                requestEntity,
-                FluctuationResponseDto.class
-        );
-
-        return Objects.requireNonNull(response.getBody()).getRates();
+        return exchangeClient.fluctuation(
+                command.getBase(),
+                symbolsParam,
+                command.getEndDate(),
+                command.getStartDate());
     }
 
-    public Map<String, Double> getLatestRates(String baseCurrency, List<String> symbols) {
-        URI baseUri = URI.create(properties.getBaseUrl() + "/latest");
+    public LatestRatesDto getLatestRates(LatestCommand command) {
+        String symbolsParam = command.getSymbols() == null || command.getSymbols().isEmpty()
+                ? null
+                : String.join(",", command.getSymbols());
 
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder
-                .fromUri(baseUri);
-
-        if (baseCurrency != null && !baseCurrency.isBlank()) {
-            uriBuilder.queryParam("base", baseCurrency);
-        }
-
-        addSymbolsParam(uriBuilder, symbols);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("apikey", properties.getApiKey());
-
-        HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
-
-        ResponseEntity<LatestRatesResponseDto> response = restTemplate.exchange(
-                uriBuilder.build().toUri(),
-                HttpMethod.GET,
-                requestEntity,
-                LatestRatesResponseDto.class
-        );
-
-        return Objects.requireNonNull(response.getBody()).getRates();
+        return exchangeClient.latestRates(command.getBaseCurrency(), symbolsParam);
     }
 
-    public Map<String, String> getSymbols() {
-        URI baseUri = URI.create(properties.getBaseUrl() + "/symbols");
-
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder
-                .fromUri(baseUri);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("apikey", properties.getApiKey());
-
-        HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
-
-        ResponseEntity<SymbolsDto> response = restTemplate.exchange(
-                uriBuilder.build().toUri(),
-                HttpMethod.GET,
-                requestEntity,
-                SymbolsDto.class
-        );
-
-        return Objects.requireNonNull(response.getBody()).getSymbols();
+    @Cacheable("symbols")
+    public SymbolsDto getSymbols() {
+        System.out.println(">>> Wywołanie metody getSymbols() — brak cache");
+        return exchangeClient.symbols();
     }
 
-    public Map<String, Map<String, Double>> getTimeSeries(LocalDate endDate, LocalDate startDate, String baseCurrency, List<String> symbols) {
-        URI baseUri = URI.create(properties.getBaseUrl() + "/timeseries");
+    public TimeSeriesRatesDto getTimeSeries(TimeseriesCommand command) {
+        String symbolsParam = command.getSymbols() == null || command.getSymbols().isEmpty()
+                ? null
+                : String.join(",", command.getSymbols());
 
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder
-                .newInstance()
-                .uri(baseUri)
-                .queryParam("end_date", endDate.toString())
-                .queryParam("start_date", startDate.toString());
-
-        addBaseCurrencyParam(uriBuilder, baseCurrency);
-        addSymbolsParam(uriBuilder, symbols);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("apikey", properties.getApiKey());
-
-        HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
-
-        ResponseEntity<TimeSeriesRatesResponseDto> response = restTemplate.exchange(
-                uriBuilder.build().toUri(),
-                HttpMethod.GET,
-                requestEntity,
-                TimeSeriesRatesResponseDto.class
-        );
-
-        return Objects.requireNonNull(response.getBody()).getRates();
+        return exchangeClient.timeseries(
+                command.getBase(),
+                symbolsParam,
+                command.getEndDate(),
+                command.getStartDate());
     }
 
-    public Map<String, Double> getHistoricalRates(LocalDate date, String baseCurrency, List<String> symbols) {
-        URI baseUri = URI.create(properties.getBaseUrl() + "/" + date.toString());
+    public HistoricalDateRatesDto getHistoricalRates(HistoricalDateCommand command) {
+        String symbolsParam = command.getSymbols() == null || command.getSymbols().isEmpty()
+                ? null
+                : String.join(",", command.getSymbols());
 
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder
-                .newInstance()
-                .uri(baseUri)
-                .queryParam("date", date.toString());
-
-        addBaseCurrencyParam(uriBuilder, baseCurrency);
-        addSymbolsParam(uriBuilder, symbols);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("apikey", properties.getApiKey());
-
-        HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
-
-        ResponseEntity<HistoricalDateRatesDto> response = restTemplate.exchange(
-                uriBuilder.build().toUri(),
-                HttpMethod.GET,
-                requestEntity,
-                HistoricalDateRatesDto.class
-        );
-
-        return Objects.requireNonNull(response.getBody()).getRates();
+        return exchangeClient.historicalRates(
+                command.getDate(),
+                command.getBaseCurrency(),
+                symbolsParam);
     }
-
-    private void addSymbolsParam(UriComponentsBuilder uriBuilder, List<String> symbols) {
-        if (symbols != null && !symbols.isEmpty()) {
-            String joinedSymbols = String.join(",", symbols);
-            uriBuilder.queryParam("symbols", joinedSymbols);
-        }
-    }
-
-    private void addBaseCurrencyParam(UriComponentsBuilder uriBuilder, String baseCurrency) {
-        if (baseCurrency != null && !baseCurrency.isBlank()) {
-            uriBuilder.queryParam("base", baseCurrency);
-        }
-    }
-
 }
