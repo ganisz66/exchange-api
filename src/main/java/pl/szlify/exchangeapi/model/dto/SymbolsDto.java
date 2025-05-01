@@ -1,12 +1,12 @@
 package pl.szlify.exchangeapi.model.dto;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Map;
 
-@Data
-@NoArgsConstructor
+@Getter
+@Setter
 public class SymbolsDto {
     private Map<String, String> symbols;
 }

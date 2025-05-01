@@ -1,21 +1,23 @@
 package pl.szlify.exchangeapi.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import pl.szlify.exchangeapi.model.TestModel;
-import pl.szlify.exchangeapi.model.dto.CurrencyRateDto;
+import pl.szlify.exchangeapi.model.command.ConvertCommand;
+import pl.szlify.exchangeapi.model.command.FluctuationCommand;
+import pl.szlify.exchangeapi.model.command.HistoricalDateCommand;
+import pl.szlify.exchangeapi.model.command.LatestCommand;
+import pl.szlify.exchangeapi.model.command.TimeseriesCommand;
+import pl.szlify.exchangeapi.model.dto.CurrencyConversionDto;
+import pl.szlify.exchangeapi.model.dto.FluctuationDto;
+import pl.szlify.exchangeapi.model.dto.HistoricalDateRatesDto;
+import pl.szlify.exchangeapi.model.dto.LatestRatesDto;
+import pl.szlify.exchangeapi.model.dto.SymbolsDto;
+import pl.szlify.exchangeapi.model.dto.TimeSeriesRatesDto;
 import pl.szlify.exchangeapi.service.CurrencyService;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,55 +27,32 @@ public class CurrencyController {
     public final CurrencyService currencyService;
 
     @GetMapping("/convert")
-    public ResponseEntity<BigDecimal> convertCurrency(
-            @RequestParam String from,
-            @RequestParam String to,
-            @RequestParam BigDecimal amount,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
-    ) {
-        BigDecimal result = currencyService.convertCurrency(from, to, amount, date);
-        return ResponseEntity.ok(result);
+    public ResponseEntity<CurrencyConversionDto> convertCurrency(@Valid ConvertCommand command) {
+        return ResponseEntity.ok(currencyService.convertCurrency(command));
     }
 
     @GetMapping("/fluctuation")
-    public ResponseEntity<Map<String, CurrencyRateDto>> fluctuation(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam(required = false) String base,
-            @RequestParam(required = false) List<String> symbols
-    ) {
-        return ResponseEntity.ok(currencyService.getFluctuation(startDate, endDate, base, symbols));
+    public ResponseEntity<FluctuationDto> fluctuation(@Valid FluctuationCommand command) {
+        return ResponseEntity.ok(currencyService.getFluctuation(command));
     }
 
     @GetMapping("/latest")
-    public ResponseEntity<Map<String, Double>> getLatestRates(
-            @RequestParam(required = false) String baseCurrency,
-            @RequestParam(required = false) List<String> symbols
-    ) {
-        return ResponseEntity.ok(currencyService.getLatestRates(baseCurrency, symbols));
+    public ResponseEntity<LatestRatesDto> getLatestRates(@Valid LatestCommand command) {
+        return ResponseEntity.ok(currencyService.getLatestRates(command));
     }
 
     @GetMapping("/symbols")
-    public ResponseEntity<Map<String, String>> getSymbols() {
+    public ResponseEntity<SymbolsDto> getSymbols() {
         return ResponseEntity.ok(currencyService.getSymbols());
     }
 
     @GetMapping("/timeseries")
-    public ResponseEntity<Map<String, Map<String, Double>>> getTimeSeries(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam(required = false) String base,
-            @RequestParam(required = false) List<String> symbols
-    ) {
-        return ResponseEntity.ok(currencyService.getTimeSeries(endDate, startDate, base, symbols));
+    public ResponseEntity<TimeSeriesRatesDto> getTimeSeries(@Valid TimeseriesCommand command) {
+        return ResponseEntity.ok(currencyService.getTimeSeries(command));
     }
 
     @GetMapping("/{date}")
-    public ResponseEntity<Map<String, Double>> getHistoricalRates(
-            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-            @RequestParam(required = false) String base,
-            @RequestParam(required = false) List<String> symbols
-    ) {
-        return ResponseEntity.ok(currencyService.getHistoricalRates(date, base, symbols));
+    public ResponseEntity<HistoricalDateRatesDto> getHistoricalRates(@Valid HistoricalDateCommand command) {
+        return ResponseEntity.ok(currencyService.getHistoricalRates(command));
     }
 }

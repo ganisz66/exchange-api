@@ -36,8 +36,6 @@ public class CurrencyControllerTest {
         LocalDate date = LocalDate.of(2025, 4, 22);
         BigDecimal expectedResult = new BigDecimal("92.55");
 
-        when(currencyService.convertCurrency(from, to, amount, date)).thenReturn(expectedResult);
-
         // when + then
         mockMvc.perform(MockMvcRequestBuilders.get("/convert")
                         .param("from", from)
