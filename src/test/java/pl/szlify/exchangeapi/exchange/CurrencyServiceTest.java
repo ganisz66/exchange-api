@@ -121,6 +121,6 @@ public class CurrencyServiceTest {
         verify(emailService).send(emailCaptor.capture(), conversionDtoCaptor.capture());
         assertEquals("jankowalksiii12@gmail.com", emailCaptor.getValue());
         assertEquals(expectedConversion, conversionDtoCaptor.getValue());
-    }Siema
+    }
 }
 
