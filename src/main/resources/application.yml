@@ -1,7 +1,7 @@
 exchange:
   api:
     base-url: https://api.apilayer.com/exchangerates_data
-    api-key: oYuhQvyZBmVgvlU3Grr7DSlUvBVQxgmh
+    api-key: O4RVixbbV78XBQs9ChDKfRzjEgrZqaM5
 cache:
   expiration-hours: 1
   maximum-size: 100
