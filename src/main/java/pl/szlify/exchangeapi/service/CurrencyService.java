@@ -13,7 +13,6 @@ import pl.szlify.exchangeapi.properties.SpringMailProperties;
 public class CurrencyService {
 
     private final ExchangeClient exchangeClient;
-    private final SpringMailProperties mailProperties;
     private final EmailService emailService;
 
     public CurrencyConversionDto convertCurrency(ConvertCommand command) {
@@ -21,7 +20,7 @@ public class CurrencyService {
                 command.getTo(),
                 command.getAmount(),
                 command.getDate());
-        emailService.send(mailProperties.getUsername(), convertResult);
+        emailService.send("jankowalksiii12@gmail.com", convertResult); //TODO wersja robocza, email bedzie wyciagniety z token. Token JWT
         return convertResult;
     }
 
