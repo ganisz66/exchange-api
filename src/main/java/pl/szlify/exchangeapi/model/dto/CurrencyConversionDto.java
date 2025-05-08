@@ -1,10 +1,11 @@
-package pl.szlify.exchangeapi.dto;
+package pl.szlify.exchangeapi.model.dto;
 
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+
 
 @Getter
 @Builder
@@ -19,6 +20,7 @@ public class CurrencyConversionDto {
 
         @Getter
         @Setter
+        @Builder
         public static class ConversionInfo {
             private BigDecimal rate;
             private long timestamp;
@@ -26,6 +28,7 @@ public class CurrencyConversionDto {
 
         @Setter
         @Getter
+        @Builder
         public static class ConversionQuery {
             private BigDecimal amount;
             private String from;

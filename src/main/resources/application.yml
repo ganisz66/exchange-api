@@ -1,4 +1,22 @@
 exchange:
+
   api:
     base-url: https://api.apilayer.com/exchangerates_data
     api-key: Rsn3CzgJ8u1KOYRl8z4uJTVENT8rboZQ
+
+cache:
+  expiration-hours: 1
+  maximum-size: 100
+
+spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: jankowalksiii12@gmail.com
+    password: ypvx ehmk tmjk ktkj
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true

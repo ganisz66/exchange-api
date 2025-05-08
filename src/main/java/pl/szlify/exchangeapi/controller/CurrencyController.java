@@ -1,24 +1,23 @@
 package pl.szlify.exchangeapi.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import pl.szlify.exchangeapi.dto.CurrencyConversionDto;
-import pl.szlify.exchangeapi.dto.CurrencySymbolsDto;
-import pl.szlify.exchangeapi.dto.FluctuationDto;
-import pl.szlify.exchangeapi.dto.HistoricalRatesDto;
-import pl.szlify.exchangeapi.dto.LatestRatesDto;
-import pl.szlify.exchangeapi.dto.TimeSeriesDto;
-import pl.szlify.exchangeapi.model.TestModel;
+import pl.szlify.exchangeapi.model.command.ConvertCommand;
+import pl.szlify.exchangeapi.model.command.FluctuationCommand;
+import pl.szlify.exchangeapi.model.command.HistoricalRatesCommand;
+import pl.szlify.exchangeapi.model.command.LatestRatesCommand;
+import pl.szlify.exchangeapi.model.command.TimeSeriesRatesCommand;
+import pl.szlify.exchangeapi.model.dto.CurrencyConversionDto;
+import pl.szlify.exchangeapi.model.dto.CurrencySymbolsDto;
+import pl.szlify.exchangeapi.model.dto.FluctuationDto;
+import pl.szlify.exchangeapi.model.dto.HistoricalRatesDto;
+import pl.szlify.exchangeapi.model.dto.LatestRatesDto;
+import pl.szlify.exchangeapi.model.dto.TimeSeriesDto;
 import pl.szlify.exchangeapi.service.CurrencyService;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,21 +26,11 @@ public class CurrencyController {
 
     public final CurrencyService currencyService;
 
-
-    @GetMapping("/test")
-    public TestModel test() {
-        return currencyService.getTestModel();
-    }
+    // Api should not return simple data as: String, BigDecimal etc. Simple data is not serializable into JSON. Deserialization will be required.
 
     @GetMapping("/convert")
-    public ResponseEntity<CurrencyConversionDto> convertCurrency(
-            @RequestParam String from,
-            @RequestParam String to,
-            @RequestParam BigDecimal amount,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
-    ) {
-        CurrencyConversionDto result = currencyService.convertCurrency(from, to, amount, date);
-        return ResponseEntity.ok(result);
+    public ResponseEntity<CurrencyConversionDto> convertCurrency(@Valid ConvertCommand command) {
+        return ResponseEntity.ok(currencyService.convertCurrency(command));
     }
 
     @GetMapping("/symbols")
@@ -50,35 +39,22 @@ public class CurrencyController {
     }
 
     @GetMapping("/fluctuation")
-    public ResponseEntity<FluctuationDto> getFluctuation(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-            @RequestParam(required = false) String base,
-            @RequestParam(required = false) String symbols) {
-        return ResponseEntity.ok(currencyService.getFluctuation(startDate, endDate, base, symbols));
+    public ResponseEntity<FluctuationDto> getFluctuation(@Valid FluctuationCommand command) {
+        return ResponseEntity.ok(currencyService.getFluctuation(command));
     }
 
     @GetMapping("/latest")
-    public ResponseEntity<LatestRatesDto> getLatestRates(
-            @RequestParam(required = false) String base,
-            @RequestParam(required = false) String symbols) {
-        return ResponseEntity.ok(currencyService.getLatestRates(base, symbols));
+    public ResponseEntity<LatestRatesDto> getLatestRates(@Valid LatestRatesCommand command) {
+        return ResponseEntity.ok(currencyService.getLatestRates(command));
     }
 
     @GetMapping("/timeseries")
-    public ResponseEntity<TimeSeriesDto> getTimeSeries(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-            @RequestParam(required = false) String base,
-            @RequestParam(required = false) String symbols) {
-        return ResponseEntity.ok(currencyService.getTimeSeries(startDate, endDate, base, symbols));
+    public ResponseEntity<TimeSeriesDto> getTimeSeries(@Valid TimeSeriesRatesCommand command) {
+        return ResponseEntity.ok(currencyService.getTimeSeries(command));
     }
 
     @GetMapping("/{date}")
-    public ResponseEntity<HistoricalRatesDto> getHistoricalRates(
-            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-            @RequestParam(required = false) String base,
-            @RequestParam(required = false) String symbols) {
-        return ResponseEntity.ok(currencyService.getHistoricalRates(date, base, symbols));
+    public ResponseEntity<HistoricalRatesDto> getHistoricalRates(@Valid HistoricalRatesCommand command) {
+        return ResponseEntity.ok(currencyService.getHistoricalRates(command));
     }
 }

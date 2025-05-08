@@ -1,4 +1,4 @@
-package pl.szlify.exchangeapi.dto;
+package pl.szlify.exchangeapi.model.dto;
 
 import lombok.Builder;
 import lombok.Getter;

@@ -4,12 +4,12 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties(prefix = "exchange.api")
+@ConfigurationProperties(prefix = "exchange.cache")
 @Getter
 @Setter
-public class ExchangeApiProperties {
+public class CacheProperties {
 
-    private String baseUrl;
-    private String apiKey;
-
+    private int expirationHours;
+    private int maximumSize;
 }
+
