@@ -4,17 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import pl.szlify.exchangeapi.client.ExchangeClient;
-import pl.szlify.exchangeapi.model.command.ConvertCommand;
-import pl.szlify.exchangeapi.model.command.FluctuationCommand;
-import pl.szlify.exchangeapi.model.command.HistoricalDateCommand;
-import pl.szlify.exchangeapi.model.command.LatestCommand;
-import pl.szlify.exchangeapi.model.command.TimeseriesCommand;
-import pl.szlify.exchangeapi.model.dto.CurrencyConversionDto;
-import pl.szlify.exchangeapi.model.dto.FluctuationDto;
-import pl.szlify.exchangeapi.model.dto.HistoricalDateRatesDto;
-import pl.szlify.exchangeapi.model.dto.LatestRatesDto;
-import pl.szlify.exchangeapi.model.dto.SymbolsDto;
-import pl.szlify.exchangeapi.model.dto.TimeSeriesRatesDto;
+import pl.szlify.exchangeapi.model.command.*;
+import pl.szlify.exchangeapi.model.dto.*;
+import pl.szlify.exchangeapi.properties.SpringMailProperties;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +20,7 @@ public class CurrencyService {
                 command.getTo(),
                 command.getAmount(),
                 command.getDate());
-        emailService.send("jankowalksiii12@gmail.com", convertResult);
+        emailService.send("jankowalksiii12@gmail.com", convertResult); //TODO wersja robocza, email bedzie wyciagniety z token. Token JWT
         return convertResult;
     }
 
@@ -54,7 +46,7 @@ public class CurrencyService {
 
     @Cacheable("symbols")
     public SymbolsDto getSymbols() {
-        System.out.println(">>> Wywołanie metody getSymbols() — brak cache");
+//        System.out.println(">>> Wywołanie metody getSymbols() — brak cache");
         return exchangeClient.symbols();
     }
 
