@@ -18,7 +18,6 @@ public class FeignClientConfig {
 
     private final ExchangeApiProperties exchangeApiProperties;
 
-    //TODO przeanalizju cala implementacje Bartka, poczytaj o feign client, cashing- caffeine i inne biblioteki
 
     @Bean
     public ExchangeClient exchangeClient() {
