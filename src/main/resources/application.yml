@@ -2,9 +2,15 @@ exchange:
   api:
     base-url: https://api.apilayer.com/exchangerates_data
     api-key: O4RVixbbV78XBQs9ChDKfRzjEgrZqaM5
-cache:
-  expiration-hours: 1
-  maximum-size: 100
+  executor:
+    core-pool-size: 5
+    max-pool-size: 10
+    queue-capacity: 100
+    keep-alive-seconds: 60
+  cache:
+    expiration-hours: 1
+    maximum-size: 100
+
 spring:
   mail:
     host: smtp.gmail.com
@@ -17,4 +23,5 @@ spring:
           auth: true
           starttls:
             enable: true
+
 

@@ -13,8 +13,6 @@ import pl.szlify.exchangeapi.model.command.LatestCommand;
 import pl.szlify.exchangeapi.model.dto.CurrencyConversionDto;
 import pl.szlify.exchangeapi.model.dto.FluctuationDto;
 import pl.szlify.exchangeapi.model.dto.LatestRatesDto;
-import pl.szlify.exchangeapi.model.dto.SymbolsDto;
-import pl.szlify.exchangeapi.properties.SpringMailProperties;
 import pl.szlify.exchangeapi.service.CurrencyService;
 import pl.szlify.exchangeapi.service.EmailService;
 
@@ -41,9 +39,6 @@ public class CurrencyServiceTest {
     @Mock
     private EmailService emailService;
 
-    @Mock
-    private SpringMailProperties springMailProperties;
-
     private Faker faker = new Faker();
 
     @Test
@@ -64,7 +59,7 @@ public class CurrencyServiceTest {
                 command.getTo(),
                 command.getAmount(),
                 command.getDate());
-        verify(emailService).send(springMailProperties.getUsername(), dto);
+        verify(emailService).send("jankowalksiii12@gmail.com", dto);
 
         assertEquals(dto, result);
     }

@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import pl.szlify.exchangeapi.client.ExchangeClient;
 import pl.szlify.exchangeapi.model.command.*;
 import pl.szlify.exchangeapi.model.dto.*;
-import pl.szlify.exchangeapi.properties.SpringMailProperties;
 
 @Service
 @RequiredArgsConstructor
