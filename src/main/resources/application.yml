@@ -4,6 +4,14 @@ exchange:
     base-url: https://api.apilayer.com/exchangerates_data
     api-key: Rsn3CzgJ8u1KOYRl8z4uJTVENT8rboZQ
 
+  async:
+    core-pool-size: 5
+    max-pool-size: 10
+    queue-capacity: 25
+    thread-name-prefix: "EmailSender-"
+    wait-for-tasks-to-complete-on-shutdown: true
+    rejection-policy: "CALLER_RUNS"
+
 cache:
   expiration-hours: 1
   maximum-size: 100
