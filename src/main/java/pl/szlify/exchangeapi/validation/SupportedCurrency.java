@@ -9,7 +9,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Constraint(validatedBy = SupportedCurrencyValidator.class)
+@Constraint(validatedBy = {SupportedCurrencyValidator.class, SupportedCurrencyListValidator.class})
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 @NotNull

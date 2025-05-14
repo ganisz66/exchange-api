@@ -2,7 +2,7 @@ exchange:
 
   api:
     base-url: https://api.apilayer.com/exchangerates_data
-    api-key: Rsn3CzgJ8u1KOYRl8z4uJTVENT8rboZQ
+    api-key: kRDWpYN2kuwD0130FZBvUY3jJ6UJrQKi
 
   async:
     core-pool-size: 5

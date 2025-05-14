@@ -35,11 +35,15 @@ public interface ExchangeClient {
     LatestRatesDto getLatest(@Param("base") String base,
                              @Param("symbols") String symbols);
 
-    @RequestLine("GET /timeseries?startDate={startDate}&endDate={endDate}&base={base}&symbols={symbols}")
-    TimeSeriesDto getTimeSeries(@Param("startDate") LocalDate startDate,
-                                @Param("endDate") LocalDate endDate,
-                                @Param("base") String base,
-                                @Param("symbols") String symbols);
+    @RequestLine("GET /timeseries?start_date={startDate}&end_date={endDate}&base={base}&symbols={symbols}")
+    TimeSeriesDto getTimeSeries(
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate,
+            @Param("base") String base,
+            @Param("symbols") String symbols
+    );
+
+
 
     @RequestLine("GET /{date}?base={base}&symbols={symbols}")
     HistoricalRatesDto getHistoricalRates(@Param("date") LocalDate date,
