@@ -9,16 +9,22 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import pl.szlify.exchangeapi.client.ExchangeClient;
 import pl.szlify.exchangeapi.model.command.ConvertCommand;
 import pl.szlify.exchangeapi.model.command.FluctuationCommand;
+import pl.szlify.exchangeapi.model.command.HistoricalDateCommand;
 import pl.szlify.exchangeapi.model.command.LatestCommand;
+import pl.szlify.exchangeapi.model.command.TimeseriesCommand;
 import pl.szlify.exchangeapi.model.dto.CurrencyConversionDto;
 import pl.szlify.exchangeapi.model.dto.FluctuationDto;
+import pl.szlify.exchangeapi.model.dto.HistoricalDateRatesDto;
 import pl.szlify.exchangeapi.model.dto.LatestRatesDto;
+import pl.szlify.exchangeapi.model.dto.SymbolsDto;
+import pl.szlify.exchangeapi.model.dto.TimeSeriesRatesDto;
 import pl.szlify.exchangeapi.service.CurrencyService;
 import pl.szlify.exchangeapi.service.EmailService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,7 +34,6 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class CurrencyServiceTest {
-
 
     @InjectMocks
     private CurrencyService currencyService;
@@ -142,17 +147,91 @@ public class CurrencyServiceTest {
         assertEquals(dto, result);
     }
 
-//    @Test
-//    void getSymbolsTest_ResultInSymbolsBeingReturned() {
-//        //given
-//        SymbolsDto dto =
-//    }
-//
-//    private SymbolsDto buildSymbolsDto() {
-//        return new SymbolsDto()
-//                .setSymbols(Map.of("PLN", "Polish Zloty"
-//                                , "PHP", "Philippine Peso"));
-//    }
+    @Test
+    void getSymbolsTest_ResultInSymbolsBeingReturned() {
+        //given
+        SymbolsDto dto = buildSymbolsDto();
+
+        when(exchangeClient.symbols()).thenReturn(dto);
+
+        //when
+        SymbolsDto result = currencyService.getSymbols();
+
+        //than
+        verify(exchangeClient).symbols();
+        assertEquals(dto, result);
+    }
+
+    @Test
+    void getTimeSeriesTest_ResultInTimeseriesBeingReturned() {
+        //given
+        TimeseriesCommand command = buildTimeseriesCommand();
+        TimeSeriesRatesDto dto = buildTimeSeriesRatesDto();
+
+        String symbolsParam = String.join(",", command.getSymbols());
+
+        when(exchangeClient.timeseries(
+                command.getBase(),
+                symbolsParam,
+                command.getEndDate(),
+                command.getStartDate()
+        )).thenReturn(dto);
+
+        //when
+        TimeSeriesRatesDto result = currencyService.getTimeSeries(command);
+
+        //than
+        verify(exchangeClient).timeseries(
+                command.getBase(),
+                symbolsParam,
+                command.getEndDate(),
+                command.getStartDate());
+
+        assertEquals(dto, result);
+    }
+
+    @Test
+    void getHistoricalRatesTest_ResultInHistoricalRatesBeingReturned() {
+        //given
+        HistoricalDateCommand command = buildHistoricalDateCommand();
+        HistoricalDateRatesDto dto = buildHistoricalDateRatesDto();
+
+        String symbolsParam = String.join(",", command.getSymbols());
+
+        when(exchangeClient.historicalRates(
+                command.getDate(),
+                command.getBaseCurrency(),
+                symbolsParam
+        )).thenReturn(dto);
+
+        //when
+        HistoricalDateRatesDto result = currencyService.getHistoricalRates(command);
+
+        //than
+        verify(exchangeClient).historicalRates(
+                command.getDate(),
+                command.getBaseCurrency(),
+                symbolsParam
+        );
+        assertEquals(dto, result);
+    }
+
+    private HistoricalDateCommand buildHistoricalDateCommand() {
+        List<String> symbols = Arrays.asList(randomCurrencyCode(), randomCurrencyCode());
+        return new HistoricalDateCommand()
+                .setBaseCurrency(randomCurrencyCode())
+                .setSymbols(symbols)
+                .setDate(LocalDate.now().minusDays(1));
+    }
+
+    private TimeseriesCommand buildTimeseriesCommand() {
+        List<String> symbols = Arrays.asList(randomCurrencyCode(), randomCurrencyCode());
+        return new TimeseriesCommand()
+                .setBase(randomCurrencyCode())
+                .setSymbols(symbols)
+                .setStartDate(LocalDate.now().minusDays(1))
+                .setEndDate(LocalDate.now().plusDays(1));
+    }
 
     private LatestCommand buildLatestCommand() {
         List<String> symbols = Arrays.asList(randomCurrencyCode(), randomCurrencyCode());
@@ -179,13 +258,62 @@ public class CurrencyServiceTest {
                 .setStartDate(LocalDate.now().minusDays(1));
     }
 
-//    private FluctuationCommand buildFluctuationCommandWithoutSymbols() {
+    //    private FluctuationCommand buildFluctuationCommandWithoutSymbols() {
 //        return new FluctuationCommand()
 //                .setBase(randomCurrencyCode())
 //                .setSymbols(null)
 //                .setEndDate(LocalDate.now().plusDays(1))
 //                .setStartDate(LocalDate.now().minusDays(1));
 //    }
+    private SymbolsDto buildSymbolsDto() {
+        SymbolsDto dto = new SymbolsDto();
+        dto.setSymbols(Map.of(
+                "PLN", "Polish Zloty",
+                "PHP", "Philippine Peso"
+        ));
+        return dto;
+    }
+
+    private HistoricalDateRatesDto buildHistoricalDateRatesDto() {
+        Map<String, BigDecimal> rates = Map.of(randomCurrencyCode(), BigDecimal.valueOf(randomDouble()));
+
+        return HistoricalDateRatesDto.builder()
+                .base(randomCurrencyCode())
+                .date(faker.date().toString())
+                .historical(true)
+                .rates(rates)
+                .success(true)
+                .timestamp(faker.random().nextLong())
+                .build();
+    }
+
+    private TimeSeriesRatesDto buildTimeSeriesRatesDto() {
+        Map<String, Map<String, BigDecimal>> rates = new HashMap<>();
+
+        Map<String, BigDecimal> ratesForDate1 = Map.of(
+                "GBP", new BigDecimal("0.199847"),
+                "USD", new BigDecimal("0.246801"),
+                "CHF", new BigDecimal("0.225069")
+        );
+
+        Map<String, BigDecimal> ratesForDate2 = Map.of(
+                "GBP", new BigDecimal("0.200111"),
+                "USD", new BigDecimal("0.247999"),
+                "CHF", new BigDecimal("0.226000")
+        );
+
+        rates.put(LocalDate.now().minusDays(2).toString(), ratesForDate1);
+        rates.put(LocalDate.now().minusDays(1).toString(), ratesForDate2);
+
+        return TimeSeriesRatesDto.builder()
+                .base(randomCurrencyCode())
+                .start_date(LocalDate.now().minusDays(2).toString())
+                .end_date(LocalDate.now().minusDays(1).toString())
+                .success(true)
+                .timeseries(true)
+                .rates(rates)
+                .build();
+    }
 
     private FluctuationDto buildFluctuationDto() {
         String start_date = faker.date().toString();
@@ -267,6 +395,6 @@ public class CurrencyServiceTest {
     }
 
     private Double randomDouble() {
-        return faker.number().randomDouble(2,1,5);
+        return faker.number().randomDouble(2, 1, 5);
     }
 }
