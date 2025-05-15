@@ -18,6 +18,7 @@ public class FluctuationDto {
 
     @Getter
     @Setter
+    @Builder
     public static class FluctuationRate {
         private BigDecimal start_rate;
         private BigDecimal end_rate;

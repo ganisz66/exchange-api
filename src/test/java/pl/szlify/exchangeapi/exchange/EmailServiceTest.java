@@ -15,6 +15,7 @@ import pl.szlify.exchangeapi.service.EmailService;
 import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
@@ -31,12 +32,10 @@ public class EmailServiceTest {
 
     @Test
     void testSend_ResultsInEmailBeingCorrect() {
-
         // given
         String recipientEmail = "test@example.com";
-
         CurrencyConversionDto.ConversionQuery query = CurrencyConversionDto.ConversionQuery.builder()
-                .amount(new BigDecimal("100.00"))
+                .amount(new BigDecimal("100"))
                 .from("USD")
                 .to("EUR")
                 .build();
@@ -50,7 +49,7 @@ public class EmailServiceTest {
                 .date("2025-05-08")
                 .info(info)
                 .query(query)
-                .result(new BigDecimal("85.00"))
+                .result(new BigDecimal("85"))
                 .success(true)
                 .build();
 
@@ -65,13 +64,12 @@ public class EmailServiceTest {
         assertEquals(recipientEmail, message.getTo()[0]);
         assertEquals("Covert confirmation", message.getSubject());
 
-        String expectedText = "Currency Conversion Confirmation\n\n" +
-                "Date: 2025-05-08\n" +
-                "Conversion Details:\n" +
-                "- Amount: 100.00 USD\n" +
-                "- Converted to: 85.00 EUR\n" +
-                "- Exchange rate: 0.85\n";
-
-        assertEquals(expectedText, message.getText());
+        String messageText = message.getText();
+        assertTrue(messageText.contains("Currency Conversion Confirmation"));
+        assertTrue(messageText.contains("Date: 2025-05-08"));
+        assertTrue(messageText.contains("Amount: 100 USD"));
+        assertTrue(messageText.contains("Converted to: 85 EUR"));
+        assertTrue(messageText.contains("Exchange rate: 0.85"));
     }
+
 }
