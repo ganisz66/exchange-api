@@ -28,3 +28,12 @@ spring:
           auth: true
           starttls:
             enable: true
+
+  security:
+    users:
+      - username: user
+        password: '{noop}user'
+        roles: USER
+      - username: admin
+        password: '{noop}admin'
+        roles: USER,ADMIN

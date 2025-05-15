@@ -8,9 +8,10 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import pl.szlify.exchangeapi.properties.AsyncEmailProperties;
 import pl.szlify.exchangeapi.properties.CacheProperties;
 import pl.szlify.exchangeapi.properties.ExchangeApiProperties;
+import pl.szlify.exchangeapi.properties.SecurityApiProperties;
 
 @SpringBootApplication
-@EnableConfigurationProperties({ExchangeApiProperties.class, CacheProperties.class, AsyncEmailProperties.class})
+@EnableConfigurationProperties({ExchangeApiProperties.class, CacheProperties.class, AsyncEmailProperties.class, SecurityApiProperties.class})
 @EnableCaching
 @EnableAsync
 public class ExchangeApiApplication {
