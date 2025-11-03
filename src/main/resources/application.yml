@@ -12,15 +12,21 @@ exchange:
     maximum-size: 100
 
 spring:
+  cloud:
+    openfeign:
+      client:
+        config:
+          exchangeApiClient:
+            connect-timeout: 5000
+            read-timeout: 5000
+            logger-level: basic
+            default-request-headers:
+              apiKey: ${exchange.api.api-key}
   datasource:
     url: jdbc:mysql://localhost:3306/exchange-api
     username: root
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
-  liquibase:
-    enabled: true
-    change-log: classpath:db/changelog-master.xml
-    drop-first: false
   mail:
     host: smtp.gmail.com
     port: 587
