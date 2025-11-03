@@ -1,0 +1,21 @@
+logging:
+  level:
+    org.springframework.mail: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.validation: DEBUG
+exchange:
+  api:
+    base-url: http://localhost:8089
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  mail:
+    host: localhost
+    port: 2525
+    username:
+    password:
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls.enable: false

@@ -1,4 +1,4 @@
-package pl.szlify.exchangeapi;
+package pl.szlify.exchangeapi.service;
 
 import com.github.javafaker.Faker;
 import org.junit.jupiter.api.Test;
@@ -11,7 +11,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import pl.szlify.exchangeapi.model.dto.CurrencyConversionDto;
-import pl.szlify.exchangeapi.service.EmailService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

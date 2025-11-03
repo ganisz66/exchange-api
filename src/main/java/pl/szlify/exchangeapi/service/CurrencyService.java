@@ -19,7 +19,7 @@ public class CurrencyService {
                 command.getTo(),
                 command.getAmount(),
                 command.getDate());
-        emailService.send("jankowalksiii12@gmail.com", convertResult); //TODO wersja robocza, email bedzie wyciagniety z token. Token JWT
+        emailService.send("jankowalksiii12@gmail.com", convertResult);
         return convertResult;
     }
 
@@ -45,7 +45,6 @@ public class CurrencyService {
 
     @Cacheable("symbols")
     public SymbolsDto getSymbols() {
-//        System.out.println(">>> Wywołanie metody getSymbols() — brak cache");
         return exchangeClient.symbols();
     }
 

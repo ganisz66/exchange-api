@@ -1,4 +1,4 @@
-package pl.szlify.exchangeapi;
+package pl.szlify.exchangeapi.service;
 
 import com.github.javafaker.Faker;
 import org.junit.jupiter.api.Test;
@@ -18,8 +18,6 @@ import pl.szlify.exchangeapi.model.dto.HistoricalDateRatesDto;
 import pl.szlify.exchangeapi.model.dto.LatestRatesDto;
 import pl.szlify.exchangeapi.model.dto.SymbolsDto;
 import pl.szlify.exchangeapi.model.dto.TimeSeriesRatesDto;
-import pl.szlify.exchangeapi.service.CurrencyService;
-import pl.szlify.exchangeapi.service.EmailService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -97,31 +95,31 @@ public class CurrencyServiceTest {
         assertEquals(dto, result);
     }
 
-//    @Test
-//    void getFluctuationTest_WithoutSymbols_ResultInFluctuationBeingReturned() {
-//        //given
-//        FluctuationCommand command = buildFluctuationCommandWithoutSymbols();
-//        FluctuationDto dto = buildFluctuationDto();
-//
-//        when(exchangeClient.fluctuation(
-//                command.getBase(),
-//                null,
-//                command.getEndDate(),
-//                command.getStartDate()))
-//                .thenReturn(dto);
-//
-//        //when
-//        FluctuationDto result = currencyService.getFluctuation(command);
-//
-//        //than
-//        verify(exchangeClient).fluctuation(
-//                command.getBase(),
-//                null,
-//                command.getEndDate(),
-//                command.getStartDate());
-//
-//        assertEquals(dto, result);
-//    }
+    @Test
+    void getFluctuationTest_WithoutSymbols_ResultInFluctuationBeingReturned() {
+        //given
+        FluctuationCommand command = buildFluctuationCommandWithoutSymbols();
+        FluctuationDto dto = buildFluctuationDto();
+
+        when(exchangeClient.fluctuation(
+                command.getBase(),
+                null,
+                command.getEndDate(),
+                command.getStartDate()))
+                .thenReturn(dto);
+
+        //when
+        FluctuationDto result = currencyService.getFluctuation(command);
+
+        //than
+        verify(exchangeClient).fluctuation(
+                command.getBase(),
+                null,
+                command.getEndDate(),
+                command.getStartDate());
+
+        assertEquals(dto, result);
+    }
 
     @Test
     void getLatestRatesTest_ResultInLatestRatesBeingReturned() {
@@ -258,13 +256,14 @@ public class CurrencyServiceTest {
                 .setStartDate(LocalDate.now().minusDays(1));
     }
 
-    //    private FluctuationCommand buildFluctuationCommandWithoutSymbols() {
-//        return new FluctuationCommand()
-//                .setBase(randomCurrencyCode())
-//                .setSymbols(null)
-//                .setEndDate(LocalDate.now().plusDays(1))
-//                .setStartDate(LocalDate.now().minusDays(1));
-//    }
+    private FluctuationCommand buildFluctuationCommandWithoutSymbols() {
+        return new FluctuationCommand()
+                .setBase(randomCurrencyCode())
+                .setSymbols(null)
+                .setEndDate(LocalDate.now().plusDays(1))
+                .setStartDate(LocalDate.now().minusDays(1));
+    }
+
     private SymbolsDto buildSymbolsDto() {
         SymbolsDto dto = new SymbolsDto();
         dto.setSymbols(Map.of(
@@ -336,26 +335,26 @@ public class CurrencyServiceTest {
                 .build();
     }
 
-//    private FluctuationDto buildFluctuationDtoWithoutSymbols() {
-//        String start_date = faker.date().toString();
-//        String end_date = faker.date().toString();
-//        String base = randomCurrencyCode();
-//
-//        FluctuationDto.FluctuationRate rate = new FluctuationDto.FluctuationRate();
-//        rate.setStart_rate(BigDecimal.valueOf(randomDouble()));
-//        rate.setEnd_rate(BigDecimal.valueOf(randomDouble()));
-//        rate.setChange(BigDecimal.valueOf(randomDouble()));
-//        rate.setChange_pct(BigDecimal.valueOf(randomDouble()));
-//
-//        Map<String, FluctuationDto.FluctuationRate> rates = Map.of(randomCurrencyCode(), rate);
-//        return FluctuationDto.builder()
-//                .start_date(start_date)
-//                .end_date(end_date)
-//                .base(base)
-//                .rates(rates)
-//                .success(true)
-//                .build();
-//    }
+    private FluctuationDto buildFluctuationDtoWithoutSymbols() {
+        String start_date = faker.date().toString();
+        String end_date = faker.date().toString();
+        String base = randomCurrencyCode();
+
+        FluctuationDto.FluctuationRate rate = new FluctuationDto.FluctuationRate();
+        rate.setStart_rate(BigDecimal.valueOf(randomDouble()));
+        rate.setEnd_rate(BigDecimal.valueOf(randomDouble()));
+        rate.setChange(BigDecimal.valueOf(randomDouble()));
+        rate.setChange_pct(BigDecimal.valueOf(randomDouble()));
+
+        Map<String, FluctuationDto.FluctuationRate> rates = Map.of(randomCurrencyCode(), rate);
+        return FluctuationDto.builder()
+                .start_date(start_date)
+                .end_date(end_date)
+                .base(base)
+                .rates(rates)
+                .success(true)
+                .build();
+    }
 
     private ConvertCommand buildConvertCommand() {
         return new ConvertCommand()
